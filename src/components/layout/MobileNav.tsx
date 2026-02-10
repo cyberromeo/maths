@@ -13,6 +13,7 @@ import {
     Trophy
 } from "lucide-react";
 import { clsx } from "clsx";
+import { t } from "@/lib/translations";
 
 export function MobileNav() {
     const { user } = useAuth();
@@ -28,11 +29,11 @@ export function MobileNav() {
     ];
 
     const studentLinks = [
-        { href: "/student", label: "Home", icon: LayoutDashboard },
-        { href: "/student/chapters", label: "Practice", icon: BookOpen },
-        { href: "/student/results", label: "Results", icon: ClipboardList },
-        { href: "/student/leaderboard", label: "Rankings", icon: Trophy },
-        { href: "/student/custom-test", label: "Custom", icon: FileQuestion },
+        { href: "/student", label: t(user?.medium, "nav_home"), icon: LayoutDashboard },
+        { href: "/student/chapters", label: t(user?.medium, "nav_practice"), icon: BookOpen },
+        { href: "/student/results", label: t(user?.medium, "nav_results"), icon: ClipboardList },
+        { href: "/student/leaderboard", label: t(user?.medium, "nav_leaderboard"), icon: Trophy },
+        { href: "/student/custom-test", label: t(user?.medium, "nav_custom"), icon: FileQuestion },
     ];
 
     const links = user.role === "teacher" ? teacherLinks : studentLinks;

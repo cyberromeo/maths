@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { getChapters } from '@/lib/database';
 import type { Chapter } from '@/lib/database';
+import { t } from '@/lib/translations';
 
 export default function StudentDashboard() {
     const { user, logout } = useAuth();
@@ -13,8 +14,9 @@ export default function StudentDashboard() {
 
     useEffect(() => {
         async function fetchChapters() {
+            if (!user) return;
             try {
-                const data = await getChapters();
+                const data = await getChapters(user.medium);
                 setChapters(data);
             } catch (error) {
                 console.error('Error fetching chapters:', error);
@@ -23,7 +25,7 @@ export default function StudentDashboard() {
             }
         }
         fetchChapters();
-    }, []);
+    }, [user]);
 
     const handleLogout = async () => {
         await logout();
@@ -49,7 +51,7 @@ export default function StudentDashboard() {
                     onClick={handleLogout}
                     className="text-gray-500 hover:text-red-500 font-medium"
                 >
-                    Logout
+                    {t(user?.medium, "logout")}
                 </button>
             </div>
 
@@ -57,9 +59,9 @@ export default function StudentDashboard() {
                 {/* Welcome */}
                 <div className="mb-8 text-center">
                     <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                        Hi{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋
+                        {t(user?.medium, "welcome")}{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋
                     </h1>
-                    <p className="text-gray-500">Choose a chapter to start practicing</p>
+                    <p className="text-gray-500">{t(user?.medium, "choose_chapter")}</p>
                 </div>
 
                 {/* Chapters List */}
@@ -73,7 +75,7 @@ export default function StudentDashboard() {
                     </div>
                 ) : chapters.length === 0 ? (
                     <div className="bg-white rounded-2xl p-12 shadow-sm text-center">
-                        <p className="text-gray-500 text-lg">No chapters yet!</p>
+                        <p className="text-gray-500 text-lg">{t(user?.medium, "no_chapters")}</p>
                     </div>
                 ) : (
                     <div className="space-y-4">
@@ -90,7 +92,7 @@ export default function StudentDashboard() {
                                             {chapter.name}
                                         </h3>
                                         <p className="text-gray-500">
-                                            {chapter.questionCount} questions
+                                            {chapter.questionCount} {t(user?.medium, "questions_count")}
                                         </p>
                                     </div>
                                     <div className="text-emerald-500 text-2xl">→</div>

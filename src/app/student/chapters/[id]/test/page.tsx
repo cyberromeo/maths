@@ -5,6 +5,7 @@ import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getQuestions, getChapter, createResult } from '@/lib/database';
 import type { Question, Chapter } from '@/lib/database';
+import { t } from '@/lib/translations';
 
 export default function TestPage() {
     const params = useParams();
@@ -148,12 +149,12 @@ export default function TestPage() {
                 <header className="bg-white shadow-sm">
                     <div className="max-w-4xl mx-auto px-4 h-16 flex items-center">
                         <button onClick={() => router.push(`/student/chapters/${chapterId}`)} className="text-gray-500 hover:text-gray-700">
-                            ← Back
+                            ← {t(user?.medium, "back")}
                         </button>
                     </div>
                 </header>
                 <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-                    <p className="text-gray-500 text-lg">No questions available for this chapter yet.</p>
+                    <p className="text-gray-500 text-lg">{t(user?.medium, "no_questions_available")}</p>
                 </div>
             </div>
         );
@@ -177,11 +178,11 @@ export default function TestPage() {
                         </div>
 
                         <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                            {percentage >= 70 ? 'Great Job!' : percentage >= 40 ? 'Good Effort!' : 'Keep Practicing!'}
+                            {percentage >= 70 ? t(user?.medium, "great_job") : percentage >= 40 ? t(user?.medium, "good_effort") : t(user?.medium, "keep_practicing")}
                         </h2>
 
                         <p className="text-gray-500 mb-6">
-                            You got {score} out of {questions.length} questions correct
+                            {t(user?.medium, "you_got")} {score} {t(user?.medium, "out_of")} {questions.length} {t(user?.medium, "questions_correct")}
                         </p>
 
                         <div className="flex gap-4 justify-center">
@@ -189,20 +190,20 @@ export default function TestPage() {
                                 onClick={() => router.push(`/student/chapters/${chapterId}`)}
                                 className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-50"
                             >
-                                Back to Chapter
+                                {t(user?.medium, "back_to_chapter")}
                             </button>
                             <button
                                 onClick={() => window.location.reload()}
                                 className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600"
                             >
-                                Try Again
+                                {t(user?.medium, "try_again")}
                             </button>
                         </div>
                     </div>
 
                     {/* Detailed Review */}
                     <div className="space-y-6">
-                        <h3 className="text-xl font-bold text-gray-800 px-2">Review Answers</h3>
+                        <h3 className="text-xl font-bold text-gray-800 px-2">{t(user?.medium, "review_answers")}</h3>
                         {questions.map((question, qIndex) => {
                             const userAnswer = selectedAnswers[qIndex];
                             const isCorrect = userAnswer === question.correctAnswer;
@@ -220,7 +221,7 @@ export default function TestPage() {
                                             <h4 className="text-gray-800 font-medium mb-1">{question.questionText}</h4>
                                             <span className={`text-xs font-medium px-2 py-0.5 rounded ${isCorrect ? 'bg-green-100 text-green-700' : isSkipped ? 'bg-gray-100 text-gray-600' : 'bg-red-100 text-red-700'
                                                 }`}>
-                                                {isCorrect ? 'Correct' : isSkipped ? 'Skipped' : 'Incorrect'}
+                                                {isCorrect ? t(user?.medium, "correct") : isSkipped ? t(user?.medium, "skipped") : t(user?.medium, "incorrect")}
                                             </span>
                                         </div>
                                     </div>
@@ -244,8 +245,8 @@ export default function TestPage() {
                                                     className={`p-3 rounded-xl border-2 text-sm flex items-center gap-3 ${optionClass}`}
                                                 >
                                                     <span className={`w-6 h-6 rounded-md flex items-center justify-center text-xs border ${isTheCorrectAnswer ? 'bg-green-500 border-green-500 text-white' :
-                                                            (isSelected && !isTheCorrectAnswer) ? 'bg-red-500 border-red-500 text-white' :
-                                                                'bg-white border-gray-200 text-gray-500'
+                                                        (isSelected && !isTheCorrectAnswer) ? 'bg-red-500 border-red-500 text-white' :
+                                                            'bg-white border-gray-200 text-gray-500'
                                                         }`}>
                                                         {String.fromCharCode(65 + optIndex)}
                                                     </span>
@@ -277,7 +278,7 @@ export default function TestPage() {
                     onClick={() => router.push(`/student/chapters/${chapterId}`)}
                     className="text-gray-500 hover:text-gray-700"
                 >
-                    ← Exit
+                    ← {t(user?.medium, "exit")}
                 </button>
 
                 <div className="flex items-center gap-4">
@@ -365,7 +366,7 @@ export default function TestPage() {
                             disabled={currentQuestionIndex === 0}
                             className="px-6 py-3 text-gray-500 hover:text-gray-700 disabled:opacity-50"
                         >
-                            ← Previous
+                            ← {t(user?.medium, "previous")}
                         </button>
                     )}
 
@@ -374,7 +375,7 @@ export default function TestPage() {
                         disabled={!hasAnswered}
                         className={`px-8 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 disabled:opacity-50 ${isExamMode ? 'ml-auto' : ''}`}
                     >
-                        {currentQuestionIndex === questions.length - 1 ? 'Finish' : 'Next →'}
+                        {currentQuestionIndex === questions.length - 1 ? t(user?.medium, "finish") : t(user?.medium, "next") + ' →'}
                     </button>
                 </div>
             </main>

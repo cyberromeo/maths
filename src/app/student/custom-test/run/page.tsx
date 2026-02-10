@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { getQuestionsForChapters, Question, createResult } from "@/lib/database";
 import { ChevronLeft, ChevronRight, CheckCircle, XCircle, Timer } from "lucide-react";
+import { t } from "@/lib/translations";
 
 export default function CustomTestRunnerPage() {
     const { user } = useAuth();
@@ -123,7 +124,7 @@ export default function CustomTestRunnerPage() {
 
             await createResult({
                 examId: "custom-test",
-                examName: mode === "exam" ? "Custom Practice Exam" : "Quick Revision Session",
+                examName: mode === "exam" ? t(user?.medium, "custom_practice_exam") : t(user?.medium, "quick_revision_session"),
                 studentId: user!.$id,
                 studentName: user!.name,
                 mode: mode,
@@ -174,21 +175,21 @@ export default function CustomTestRunnerPage() {
                         <div className="mb-6">
                             <span className="text-6xl">{percentage >= 70 ? '🎉' : '📚'}</span>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">Test Completed!</h2>
-                        <p className="text-gray-500 mb-8">Here's how you performed</p>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">{t(user?.medium, "test_completed")}</h2>
+                        <p className="text-gray-500 mb-8">{t(user?.medium, "performance_summary")}</p>
 
                         <div className="grid grid-cols-3 gap-4 mb-8">
                             <div className="p-4 bg-emerald-50 rounded-xl">
                                 <div className="text-3xl font-bold text-emerald-600">{percentage}%</div>
-                                <div className="text-sm text-emerald-800 font-medium">Score</div>
+                                <div className="text-sm text-emerald-800 font-medium">{t(user?.medium, "score")}</div>
                             </div>
                             <div className="p-4 bg-blue-50 rounded-xl">
                                 <div className="text-3xl font-bold text-blue-600">{correctCount}/{questions.length}</div>
-                                <div className="text-sm text-blue-800 font-medium">Correct</div>
+                                <div className="text-sm text-blue-800 font-medium">{t(user?.medium, "correct")}</div>
                             </div>
                             <div className="p-4 bg-purple-50 rounded-xl">
                                 <div className="text-3xl font-bold text-purple-600">{formatTime(Math.round((Date.now() - startTime) / 1000))}</div>
-                                <div className="text-sm text-purple-800 font-medium">Time</div>
+                                <div className="text-sm text-blue-800 font-medium">{t(user?.medium, "time")}</div>
                             </div>
                         </div>
 
@@ -197,20 +198,20 @@ export default function CustomTestRunnerPage() {
                                 onClick={() => router.push("/student")}
                                 className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
                             >
-                                Back to Dashboard
+                                {t(user?.medium, "back_dashboard")}
                             </button>
                             <button
                                 onClick={() => router.push("/student/custom-test")}
                                 className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 transition-all"
                             >
-                                Creates New Test
+                                {t(user?.medium, "create_new_test")}
                             </button>
                         </div>
                     </div>
 
                     {/* Detailed Review */}
                     <div className="space-y-6">
-                        <h3 className="text-xl font-bold text-gray-800 px-2">Review Answers</h3>
+                        <h3 className="text-xl font-bold text-gray-800 px-2">{t(user?.medium, "review_answers")}</h3>
                         {questions.map((question, qIndex) => {
                             const userAnswer = selectedAnswers[qIndex];
                             const isCorrect = userAnswer === question.correctAnswer;
@@ -225,7 +226,7 @@ export default function CustomTestRunnerPage() {
                                         <div className="flex-1">
                                             <h4 className="text-gray-800 font-medium mb-1">{question.questionText}</h4>
                                             <span className={`text-xs font-medium px-2 py-0.5 rounded ${isCorrect ? 'bg-green-100 text-green-700' : isSkipped ? 'bg-gray-100 text-gray-600' : 'bg-red-100 text-red-700'
-                                                }`}>{isCorrect ? 'Correct' : isSkipped ? 'Skipped' : 'Incorrect'}</span>
+                                                }`}>{isCorrect ? t(user?.medium, "correct") : isSkipped ? t(user?.medium, "skipped") : t(user?.medium, "incorrect")}</span>
                                         </div>
                                     </div>
 
@@ -278,8 +279,8 @@ export default function CustomTestRunnerPage() {
                             <ChevronLeft className="w-6 h-6 text-gray-500" />
                         </button>
                         <div>
-                            <h1 className="font-bold text-gray-800">Custom Test</h1>
-                            <p className="text-xs text-gray-500">Question {currentQuestionIndex + 1} of {questions.length}</p>
+                            <h1 className="font-bold text-gray-800">{t(user?.medium, "custom_test_header")}</h1>
+                            <p className="text-xs text-gray-500">{t(user?.medium, "question")} {currentQuestionIndex + 1} / {questions.length}</p>
                         </div>
                     </div>
 
@@ -384,7 +385,7 @@ export default function CustomTestRunnerPage() {
                             }`}
                     >
                         <ChevronLeft className="w-5 h-5" />
-                        Previous
+                        {t(user?.medium, "previous")}
                     </button>
 
                     {currentQuestionIndex === questions.length - 1 ? (
@@ -394,7 +395,7 @@ export default function CustomTestRunnerPage() {
                             className={`px-8 py-3 bg-emerald-500 text-white rounded-xl font-bold hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 transition-all flex items-center gap-2 ${submitting ? "opacity-70 cursor-wait" : ""
                                 }`}
                         >
-                            {submitting ? "Submitting..." : "Submit Test"}
+                            {submitting ? t(user?.medium, "submitting") : t(user?.medium, "submit_test")}
                             <CheckCircle className="w-5 h-5" />
                         </button>
                     ) : (
@@ -402,7 +403,7 @@ export default function CustomTestRunnerPage() {
                             onClick={handleNext}
                             className="px-6 py-3 bg-slate-900 text-white rounded-xl font-medium hover:bg-slate-800 shadow-lg shadow-slate-900/20 transition-all flex items-center gap-2"
                         >
-                            Next
+                            {t(user?.medium, "next")}
                             <ChevronRight className="w-5 h-5" />
                         </button>
                     )}

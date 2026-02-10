@@ -5,6 +5,7 @@ import { getChapters, Chapter } from "@/lib/database";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { Save, CheckSquare, Square, Play } from "lucide-react";
+import { t } from "@/lib/translations";
 
 export default function CustomTestPage() {
     const { user, loading: authLoading } = useAuth();
@@ -21,9 +22,11 @@ export default function CustomTestPage() {
         }
 
         async function loadChapters() {
-            const data = await getChapters();
-            setChapters(data);
-            setLoading(false);
+            if (user?.medium) {
+                const data = await getChapters(user.medium);
+                setChapters(data);
+                setLoading(false);
+            }
         }
         loadChapters();
     }, [user, authLoading, router]);
@@ -64,19 +67,19 @@ export default function CustomTestPage() {
         <div className="min-h-screen bg-gray-50 pb-24 md:pb-8">
             <header className="bg-white shadow-sm sticky top-0 z-10">
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <h1 className="text-xl font-bold text-gray-800">Create Custom Test</h1>
+                    <h1 className="text-xl font-bold text-gray-800">{t(user?.medium, "create_custom_test")}</h1>
                 </div>
             </header>
 
             <main className="container mx-auto px-4 py-6 max-w-2xl">
                 <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
                     <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-lg font-semibold text-gray-800">Select Chapters</h2>
+                        <h2 className="text-lg font-semibold text-gray-800">{t(user?.medium, "select_chapters")}</h2>
                         <button
                             onClick={toggleAll}
                             className="text-emerald-600 font-medium text-sm hover:text-emerald-700"
                         >
-                            {selectedChapters.length === chapters.length ? "Deselect All" : "Select All"}
+                            {selectedChapters.length === chapters.length ? t(user?.medium, "deselect_all") : t(user?.medium, "select_all")}
                         </button>
                     </div>
 
@@ -100,7 +103,7 @@ export default function CustomTestPage() {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-medium text-gray-800">{chapter.name}</h3>
-                                        <p className="text-sm text-gray-500">{chapter.questionCount} questions</p>
+                                        <p className="text-sm text-gray-500">{chapter.questionCount} {t(user?.medium, "questions_count")}</p>
                                     </div>
                                     <div className="text-2xl">{chapter.icon}</div>
                                 </div>
@@ -111,7 +114,7 @@ export default function CustomTestPage() {
 
                 {/* Mode Selection */}
                 <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4">Select Mode</h2>
+                    <h2 className="text-lg font-semibold text-gray-800 mb-4">{t(user?.medium, "select_mode")}</h2>
                     <div className="grid grid-cols-2 gap-4">
                         <button
                             onClick={() => setMode("exam")}
@@ -120,8 +123,8 @@ export default function CustomTestPage() {
                                 : "border-gray-100 hover:border-emerald-200"
                                 }`}
                         >
-                            <div className="font-bold text-gray-800 mb-1">📝 Exam Mode</div>
-                            <p className="text-xs text-gray-500">Timed, no immediate feedback. Results at the end.</p>
+                            <div className="font-bold text-gray-800 mb-1">📝 {t(user?.medium, "exam_mode")}</div>
+                            <p className="text-xs text-gray-500">{t(user?.medium, "exam_mode_desc")}</p>
                         </button>
 
                         <button
@@ -131,8 +134,8 @@ export default function CustomTestPage() {
                                 : "border-gray-100 hover:border-amber-200"
                                 }`}
                         >
-                            <div className="font-bold text-gray-800 mb-1">⚡ Quick Revise</div>
-                            <p className="text-xs text-gray-500">No time limit, instant answers. Learn as you go.</p>
+                            <div className="font-bold text-gray-800 mb-1">⚡ {t(user?.medium, "quick_revise")}</div>
+                            <p className="text-xs text-gray-500">{t(user?.medium, "quick_revise_desc")}</p>
                         </button>
                     </div>
                 </div>
@@ -148,7 +151,7 @@ export default function CustomTestPage() {
                                 }`}
                         >
                             <Play className="w-5 h-5 fill-current" />
-                            Start Test ({selectedChapters.length} Chapters)
+                            {t(user?.medium, "start_test")} ({selectedChapters.length})
                         </button>
                     </div>
                 </div>

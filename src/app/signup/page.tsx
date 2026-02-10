@@ -11,6 +11,7 @@ export default function SignupPage() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [medium, setMedium] = useState<"english" | "tamil">("english");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -25,14 +26,19 @@ export default function SignupPage() {
         setError("");
 
         if (password.length < 8) {
-            setError("Password must be at least 8 characters");
+            setError(medium === "english" ? "Password must be at least 8 characters" : "கடவுச்சொல் குறைந்தது 8 எழுத்துக்கள் இருக்க வேண்டும்");
+            return;
+        }
+
+        if (!email.toLowerCase().endsWith("@gmail.com")) {
+            setError(medium === "english" ? "Please use a valid Gmail address (@gmail.com)" : "சரியான Gmail முகவரியைப் பயன்படுத்தவும் (@gmail.com)");
             return;
         }
 
         setLoading(true);
 
         try {
-            await register(email, password, name, "student");
+            await register(email, password, name, "student", medium);
         } catch (err) {
             setError(err instanceof Error ? err.message : "Signup failed");
         } finally {
@@ -60,7 +66,33 @@ export default function SignupPage() {
                 <span className="text-white font-bold text-3xl">M</span>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">Create Account</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-8">
+                {medium === "english" ? "Create Account" : "கணக்கை உருவாக்க"}
+            </h1>
+
+            {/* Medium Selector */}
+            <div className="flex gap-4 mb-8 w-full max-w-sm">
+                <button
+                    type="button"
+                    onClick={() => setMedium("english")}
+                    className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${medium === "english"
+                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
+                        : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        }`}
+                >
+                    English Medium
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setMedium("tamil")}
+                    className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${medium === "tamil"
+                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
+                        : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                        }`}
+                >
+                    தமிழ் வழி
+                </button>
+            </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
@@ -72,7 +104,7 @@ export default function SignupPage() {
 
                 <input
                     type="text"
-                    placeholder="Your Name"
+                    placeholder={medium === "english" ? "Your Name" : "உங்கள் பெயர்"}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
@@ -81,7 +113,7 @@ export default function SignupPage() {
 
                 <input
                     type="email"
-                    placeholder="Email"
+                    placeholder={medium === "english" ? "Email" : "மின்னஞ்சல்"}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -90,7 +122,7 @@ export default function SignupPage() {
 
                 <input
                     type="password"
-                    placeholder="Password (8+ characters)"
+                    placeholder={medium === "english" ? "Password (8+ characters)" : "கடவுச்சொல் (8+ எழுத்துக்கள்)"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -102,14 +134,16 @@ export default function SignupPage() {
                     disabled={loading}
                     className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-semibold rounded-xl disabled:opacity-50"
                 >
-                    {loading ? "Creating..." : "Create Account"}
+                    {loading
+                        ? (medium === "english" ? "Creating..." : "உருவாக்குகிறது...")
+                        : (medium === "english" ? "Create Account" : "கணக்கை உருவாக்க")}
                 </button>
             </form>
 
             <p className="mt-6 text-gray-500">
-                Already have an account?{" "}
+                {medium === "english" ? "Already have an account?" : "ஏற்கனவே கணக்கு உள்ளதா?"}{" "}
                 <Link href="/login" className="text-emerald-600 font-medium">
-                    Login
+                    {medium === "english" ? "Login" : "உள்நுழைய"}
                 </Link>
             </p>
         </div>

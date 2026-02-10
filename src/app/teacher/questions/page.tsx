@@ -11,12 +11,13 @@ export default function QuestionsPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
+    const [selectedMedium, setSelectedMedium] = useState<"english" | "tamil" | null>(null);
 
     useEffect(() => {
         async function loadData() {
             try {
                 const [chaptersData, questionsData] = await Promise.all([
-                    getChapters(),
+                    getChapters(selectedMedium || undefined),
                     getQuestions()
                 ]);
                 setChapters(chaptersData);
@@ -28,13 +29,17 @@ export default function QuestionsPage() {
             }
         }
         loadData();
-    }, []);
+    }, [selectedMedium]);
 
     // Filter questions based on search and chapter
     const filteredQuestions = questions.filter((q) => {
         const matchesSearch = q.questionText.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesChapter = !selectedChapter || q.chapterId === selectedChapter;
-        return matchesSearch && matchesChapter;
+        // Filter questions by medium if filtered (by checking if their chapter is in the current chapters list)
+        // If a medium is selected, we only show questions from chapters of that medium
+        const matchesMedium = !selectedMedium || chapters.some(c => c.$id === q.chapterId && c.medium === selectedMedium);
+
+        return matchesSearch && matchesChapter && matchesMedium;
     });
 
     if (loading) {
@@ -69,23 +74,46 @@ export default function QuestionsPage() {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search questions..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
-                    />
+            <div className="flex flex-col gap-4">
+                <div className="flex gap-4">
+                    <div className="flex-1 relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search questions..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                        />
+                    </div>
+                    {/* Medium Filter */}
+                    <div className="flex bg-gray-100 rounded-xl p-1 h-[50px]">
+                        <button
+                            onClick={() => setSelectedMedium(null)}
+                            className={`px-4 rounded-lg text-sm font-medium transition-all ${!selectedMedium ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => setSelectedMedium("english")}
+                            className={`px-4 rounded-lg text-sm font-medium transition-all ${selectedMedium === "english" ? "bg-white shadow-sm text-emerald-600" : "text-gray-500 hover:text-gray-700"}`}
+                        >
+                            English
+                        </button>
+                        <button
+                            onClick={() => setSelectedMedium("tamil")}
+                            className={`px-4 rounded-lg text-sm font-medium transition-all ${selectedMedium === "tamil" ? "bg-white shadow-sm text-emerald-600" : "text-gray-500 hover:text-gray-700"}`}
+                        >
+                            Tamil
+                        </button>
+                    </div>
                 </div>
                 <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
                     <button
                         onClick={() => setSelectedChapter(null)}
                         className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${!selectedChapter
-                                ? "bg-emerald-500 text-white"
-                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                            ? "bg-emerald-500 text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                     >
                         All
@@ -95,8 +123,8 @@ export default function QuestionsPage() {
                             key={chapter.$id}
                             onClick={() => setSelectedChapter(chapter.$id)}
                             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors ${selectedChapter === chapter.$id
-                                    ? "bg-emerald-500 text-white"
-                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                ? "bg-emerald-500 text-white"
+                                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                                 }`}
                         >
                             {chapter.icon} {chapter.name.replace('Unit ', '').split(':')[0]}
@@ -127,8 +155,8 @@ export default function QuestionsPage() {
                                                 <div
                                                     key={optIdx}
                                                     className={`text-sm px-3 py-2 rounded-lg ${optIdx === question.correctAnswer
-                                                            ? "bg-green-100 text-green-700 font-medium"
-                                                            : "bg-gray-100 text-gray-600"
+                                                        ? "bg-green-100 text-green-700 font-medium"
+                                                        : "bg-gray-100 text-gray-600"
                                                         }`}
                                                 >
                                                     {String.fromCharCode(65 + optIdx)}. {option}

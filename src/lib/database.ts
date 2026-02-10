@@ -8,6 +8,7 @@ export interface Chapter {
     description: string;
     color: string;
     icon: string;
+    medium: "english" | "tamil";
     questionCount: number;
 }
 
@@ -53,12 +54,17 @@ export interface ExamResult {
 
 // ============ CHAPTERS ============
 
-export async function getChapters(): Promise<Chapter[]> {
+export async function getChapters(medium?: "english" | "tamil"): Promise<Chapter[]> {
     try {
+        const queries = [Query.orderAsc("name")];
+        if (medium) {
+            queries.push(Query.equal("medium", medium));
+        }
+
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.CHAPTERS,
-            [Query.orderAsc("name")]
+            queries
         );
         return response.documents as unknown as Chapter[];
     } catch (error) {
@@ -86,7 +92,7 @@ export async function createChapter(data: Omit<Chapter, "$id" | "questionCount">
         DATABASE_ID,
         COLLECTIONS.CHAPTERS,
         ID.unique(),
-        { ...data, questionCount: 0 }
+        { ...data, medium: data.medium || "english", questionCount: 0 }
     );
     return doc as unknown as Chapter;
 }
@@ -331,12 +337,17 @@ export async function getStudentStats(studentId: string) {
     };
 }
 
-export async function getAllStudents() {
+export async function getAllStudents(medium?: "english" | "tamil") {
     try {
+        const queries = [Query.equal("role", "student"), Query.orderAsc("name")];
+        if (medium) {
+            queries.push(Query.equal("medium", medium));
+        }
+
         const response = await databases.listDocuments(
             DATABASE_ID,
             COLLECTIONS.USERS,
-            [Query.equal("role", "student"), Query.orderAsc("name")]
+            queries
         );
         return response.documents;
     } catch (error) {

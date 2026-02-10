@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { getAllStudents, getResults, ExamResult } from "@/lib/database";
 import { useAuth } from "@/context/AuthContext";
+import { t } from "@/lib/translations"; // Import t
 import { Trophy, Medal, Award, TrendingUp, Search } from "lucide-react";
 
 interface RankItem {
@@ -24,7 +25,7 @@ export default function LeaderboardPage() {
             try {
                 // Fetch all data
                 const [studentsData, resultsData] = await Promise.all([
-                    getAllStudents(), // Get student names
+                    getAllStudents(user?.medium), // Filter students by medium
                     getResults()      // Get all exam results
                 ]);
 
@@ -37,10 +38,13 @@ export default function LeaderboardPage() {
                 const studentStats = new Map<string, { score: number, count: number, name: string }>();
 
                 resultsData.forEach((result) => {
+                    // Only process results for students in the current medium map
+                    if (!userMap.has(result.studentId)) return;
+
                     const current = studentStats.get(result.studentId) || {
                         score: 0,
                         count: 0,
-                        name: result.studentName || userMap.get(result.studentId) || 'Unknown'
+                        name: userMap.get(result.studentId)
                     };
 
                     studentStats.set(result.studentId, {
@@ -76,8 +80,8 @@ export default function LeaderboardPage() {
                 setLoading(false);
             }
         }
-        loadData();
-    }, []);
+        if (user) loadData(); // Only load if user is present to know medium
+    }, [user]);
 
     if (loading) {
         return (
@@ -93,16 +97,16 @@ export default function LeaderboardPage() {
                 <div className="container mx-auto px-4 h-16 flex items-center justify-between">
                     <h1 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                         <Trophy className="w-6 h-6 text-yellow-500" />
-                        Leaderboard
+                        {t(user?.medium, "leaderboard_title")}
                     </h1>
                 </div>
             </header>
 
             <main className="container mx-auto px-4 py-6 max-w-2xl">
                 <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-6 text-white mb-8 shadow-lg">
-                    <h2 className="text-2xl font-bold mb-2">Top Performers 🏆</h2>
+                    <h2 className="text-2xl font-bold mb-2">{t(user?.medium, "top_performers")} 🏆</h2>
                     <p className="text-emerald-100 opacity-90">
-                        Competing for the highest total score in Mathematics
+                        {t(user?.medium, "top_performers_desc")}
                     </p>
                 </div>
 
@@ -110,7 +114,7 @@ export default function LeaderboardPage() {
                     {rankings.length === 0 ? (
                         <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
                             <Trophy className="w-16 h-16 text-gray-200 mx-auto mb-4" />
-                            <p className="text-gray-500 text-lg">No rankings yet. Be the first to take a test!</p>
+                            <p className="text-gray-500 text-lg">{t(user?.medium, "no_rankings")}</p>
                         </div>
                     ) : (
                         rankings.map((item) => {
@@ -148,10 +152,10 @@ export default function LeaderboardPage() {
                                     <div className="flex-1 min-w-0">
                                         <h3 className="font-bold text-gray-800 truncate flex items-center gap-2">
                                             {item.studentName}
-                                            {isMe && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">You</span>}
+                                            {isMe && <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">{t(user?.medium, "you")}</span>}
                                         </h3>
                                         <p className="text-xs text-gray-500">
-                                            {item.testsTaken} tests taken
+                                            {item.testsTaken} {t(user?.medium, "tests_taken")}
                                         </p>
                                     </div>
 
@@ -161,7 +165,7 @@ export default function LeaderboardPage() {
                                             {item.totalScore}
                                         </div>
                                         <div className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-                                            Points
+                                            {t(user?.medium, "points")}
                                         </div>
                                     </div>
                                 </div>

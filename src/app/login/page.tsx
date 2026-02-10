@@ -22,6 +22,12 @@ export default function LoginPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+
+        if (!email.toLowerCase().endsWith("@gmail.com")) {
+            setError("Please use a valid Gmail address (@gmail.com)");
+            return;
+        }
+
         setLoading(true);
 
         try {

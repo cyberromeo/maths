@@ -5,10 +5,13 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getQuestions, getChapter } from '@/lib/database';
 import type { Chapter, Question } from '@/lib/database';
+import { useAuth } from '@/context/AuthContext';
+import { t } from '@/lib/translations';
 
 type Mode = 'exam' | 'quick';
 
 export default function ChapterDetailPage() {
+    const { user } = useAuth();
     const params = useParams();
     const chapterId = params.id as string;
     const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -48,12 +51,12 @@ export default function ChapterDetailPage() {
                 <header className="bg-white shadow-sm">
                     <div className="max-w-4xl mx-auto px-4 h-16 flex items-center">
                         <Link href="/student" className="text-gray-500 hover:text-gray-700">
-                            ← Back
+                            ← {t(user?.medium, "back")}
                         </Link>
                     </div>
                 </header>
                 <div className="max-w-4xl mx-auto px-4 py-12 text-center">
-                    <p className="text-gray-500 text-lg">Chapter not found</p>
+                    <p className="text-gray-500 text-lg">{t(user?.medium, "chapter_not_found")}</p>
                 </div>
             </div>
         );
@@ -64,7 +67,7 @@ export default function ChapterDetailPage() {
             {/* Simple back button */}
             <div className="p-4 max-w-4xl mx-auto">
                 <Link href="/student" className="text-gray-500 hover:text-gray-700">
-                    ← Back
+                    ← {t(user?.medium, "back")}
                 </Link>
             </div>
 
@@ -72,12 +75,12 @@ export default function ChapterDetailPage() {
                 {/* Chapter Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800 mb-2">{chapter.name}</h1>
-                    <p className="text-gray-500">{questions.length} questions</p>
+                    <p className="text-gray-500">{questions.length} {t(user?.medium, "questions_count")}</p>
                 </div>
 
                 {/* Mode Selection */}
                 <div className="mb-8">
-                    <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">Choose Mode</h2>
+                    <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">{t(user?.medium, "choose_mode")}</h2>
                     <div className="grid md:grid-cols-2 gap-4">
                         {/* Exam Mode */}
                         <button
@@ -88,9 +91,9 @@ export default function ChapterDetailPage() {
                                 }`}
                         >
                             <div className="text-2xl mb-2">⏱️</div>
-                            <h3 className="text-xl font-semibold mb-2">Exam Mode</h3>
+                            <h3 className="text-xl font-semibold mb-2">{t(user?.medium, "exam_mode")}</h3>
                             <p className={selectedMode === 'exam' ? 'text-emerald-100' : 'text-gray-500'}>
-                                Timed test, no going back
+                                {t(user?.medium, "exam_mode_desc_short")}
                             </p>
                         </button>
 
@@ -103,9 +106,9 @@ export default function ChapterDetailPage() {
                                 }`}
                         >
                             <div className="text-2xl mb-2">⚡</div>
-                            <h3 className="text-xl font-semibold mb-2">Quick Revise</h3>
+                            <h3 className="text-xl font-semibold mb-2">{t(user?.medium, "quick_revise")}</h3>
                             <p className={selectedMode === 'quick' ? 'text-emerald-100' : 'text-gray-500'}>
-                                Instant feedback, learn as you go
+                                {t(user?.medium, "quick_revise_desc_short")}
                             </p>
                         </button>
                     </div>
@@ -115,7 +118,7 @@ export default function ChapterDetailPage() {
                 <div className="text-center">
                     <Link href={`/student/chapters/${chapterId}/test?mode=${selectedMode}`}>
                         <button className="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white text-xl font-semibold rounded-2xl shadow-lg">
-                            Start {selectedMode === 'exam' ? 'Exam' : 'Practice'}
+                            {selectedMode === 'exam' ? t(user?.medium, "start_exam") : t(user?.medium, "start_practice")}
                         </button>
                     </Link>
                 </div>

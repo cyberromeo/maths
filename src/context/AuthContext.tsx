@@ -7,7 +7,7 @@ interface AuthContextType {
     user: User | null;
     loading: boolean;
     login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string, name: string, role: "teacher" | "student", teacherCode?: string) => Promise<void>;
+    register: (email: string, password: string, name: string, role: "teacher" | "student", medium?: "english" | "tamil", teacherCode?: string) => Promise<void>;
     logout: () => Promise<void>;
     refreshUser: () => Promise<void>;
 }
@@ -43,9 +43,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password: string,
         name: string,
         role: "teacher" | "student",
+        medium: "english" | "tamil" = "english",
         teacherCode?: string
     ) => {
-        const newUser = await signUp(email, password, name, role, teacherCode);
+        const newUser = await signUp(email, password, name, role, medium, teacherCode);
         setUser(newUser);
     };
 

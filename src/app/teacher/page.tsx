@@ -17,6 +17,7 @@ interface User {
     $id: string;
     name: string;
     email: string;
+    medium?: "english" | "tamil";
 }
 
 export default function TeacherDashboard() {
@@ -238,7 +239,9 @@ export default function TeacherDashboard() {
                                     </div>
                                     <div>
                                         <p className="font-medium text-gray-800">{student.name}</p>
-                                        <p className="text-sm text-gray-500">{student.email}</p>
+                                        <p className="text-sm text-gray-500">
+                                            {student.email} • <span className="capitalize">{student.medium || "english"}</span>
+                                        </p>
                                     </div>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-gray-400" />

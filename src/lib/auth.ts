@@ -6,6 +6,7 @@ export interface User {
     email: string;
     name: string;
     role: "teacher" | "student";
+    medium: "english" | "tamil";
     createdAt: string;
 }
 
@@ -15,6 +16,7 @@ export async function signUp(
     password: string,
     name: string,
     role: "teacher" | "student",
+    medium: "english" | "tamil" = "english",
     teacherCode?: string
 ): Promise<User> {
     // Validate teacher code if role is teacher
@@ -37,6 +39,7 @@ export async function signUp(
                 email,
                 name,
                 role,
+                medium,
                 createdAt: new Date().toISOString(),
             }
         );
@@ -49,6 +52,7 @@ export async function signUp(
             email: userDoc.email,
             name: userDoc.name,
             role: userDoc.role,
+            medium: userDoc.medium || "english",
             createdAt: userDoc.createdAt,
         };
     } catch (error) {
@@ -82,6 +86,7 @@ export async function signIn(email: string, password: string): Promise<User> {
             email: userDoc.email,
             name: userDoc.name,
             role: userDoc.role,
+            medium: userDoc.medium || "english",
             createdAt: userDoc.createdAt,
         };
     } catch (error) {
@@ -120,6 +125,7 @@ export async function getCurrentUser(): Promise<User | null> {
             email: userDoc.email,
             name: userDoc.name,
             role: userDoc.role,
+            medium: userDoc.medium || "english",
             createdAt: userDoc.createdAt,
         };
     } catch {

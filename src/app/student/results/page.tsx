@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getResults } from "@/lib/database";
 import type { ExamResult } from "@/lib/database";
+import { t } from '@/lib/translations';
 
 export default function StudentResultsPage() {
     const { user } = useAuth();
@@ -38,14 +39,14 @@ export default function StudentResultsPage() {
             {/* Simple back button */}
             <div className="p-4 max-w-4xl mx-auto">
                 <Link href="/student" className="text-gray-500 hover:text-gray-700">
-                    ← Back
+                    ← {t(user?.medium, "back")}
                 </Link>
             </div>
 
             <main className="max-w-4xl mx-auto px-4 py-8">
                 <div className="mb-8 text-center">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">My Results</h1>
-                    <p className="text-gray-500">Your test history</p>
+                    <h1 className="text-3xl font-bold text-gray-800 mb-2">{t(user?.medium, "my_results")}</h1>
+                    <p className="text-gray-500">{t(user?.medium, "test_history")}</p>
                 </div>
 
                 {loading ? (
@@ -58,10 +59,10 @@ export default function StudentResultsPage() {
                     </div>
                 ) : results.length === 0 ? (
                     <div className="bg-white rounded-2xl p-12 shadow-sm text-center">
-                        <p className="text-gray-500 text-lg mb-4">No results yet!</p>
+                        <p className="text-gray-500 text-lg mb-4">{t(user?.medium, "no_results")}</p>
                         <Link href="/student">
                             <button className="px-6 py-3 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600">
-                                Start Practicing
+                                {t(user?.medium, "start_practicing")}
                             </button>
                         </Link>
                     </div>
@@ -75,7 +76,7 @@ export default function StudentResultsPage() {
                                             {result.examName}
                                         </h3>
                                         <p className="text-gray-500">
-                                            {new Date(result.completedAt).toLocaleDateString()}
+                                            {new Date(result.completedAt).toLocaleDateString()} • {result.mode === 'exam' ? t(user?.medium, "exam_mode") : t(user?.medium, "quick_revise")}
                                         </p>
                                     </div>
                                     <div className={`px-4 py-2 rounded-xl font-bold text-lg ${getScoreColor(result.score, result.totalQuestions)}`}>
