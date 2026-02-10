@@ -31,6 +31,13 @@ export default function LandingPage() {
           </button>
         </Link>
       </div>
+
+      {/* Footer / Credit */}
+      <div className="mt-12 text-center">
+        <p className="text-gray-400 text-sm font-medium">
+          Website by T Anandhalakshmi, BT Assistant., GBHSS.
+        </p>
+      </div>
     </div>
   );
 }

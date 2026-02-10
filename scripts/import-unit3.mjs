@@ -13,7 +13,8 @@ const chapterData = {
     name: "Unit III: Algebra",
     description: "Linear equations, polynomials, matrices, and algebraic operations",
     color: "blue",
-    icon: "📐"
+    icon: "📐",
+    medium: "english"
 };
 
 const questions = [
