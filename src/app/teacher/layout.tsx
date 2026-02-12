@@ -1,65 +1,68 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-// import { useAuth } from "@/context/AuthContext"; // Optional if we still want user info
-import { Header } from "@/components/layout/Header";
-// import { MobileNav } from "@/components/layout/MobileNav"; // Teacher portal might not need student nav
+import React, { useState } from "react";
+import { GraduationCap, LockKeyhole, LogOut } from "lucide-react";
 
 export default function TeacherLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(() => {
+        if (typeof window === "undefined") {
+            return false;
+        }
+        return sessionStorage.getItem("teacherAuth") === "true";
+    });
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        const auth = sessionStorage.getItem("teacherAuth");
-        if (auth === "true") {
-            setIsAuthenticated(true);
-        }
-    }, []);
-
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
         if (password === "Sri@1405") {
             setIsAuthenticated(true);
             sessionStorage.setItem("teacherAuth", "true");
             setError("");
-        } else {
-            setError("Incorrect password");
+            return;
         }
+
+        setError("Incorrect password");
     };
 
     if (!isAuthenticated) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
-                    <div className="text-center mb-8">
-                        <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <span className="text-3xl">👨‍🏫</span>
+            <div className="min-h-screen bg-slate-100 px-4 py-8 sm:py-14">
+                <div className="mx-auto w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                    <div className="mb-7 text-center">
+                        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-100">
+                            <LockKeyhole className="h-7 w-7 text-sky-700" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-800">Teacher Access</h1>
-                        <p className="text-gray-500 mt-2">Enter password to continue</p>
+                        <h1 className="text-2xl font-bold text-slate-900">Teacher Access</h1>
+                        <p className="mt-1 text-sm text-slate-500">
+                            Enter password to open the report dashboard.
+                        </p>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div>
+                            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                Password
+                            </label>
                             <input
                                 type="password"
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                onChange={(event) => setPassword(event.target.value)}
                                 placeholder="Enter password"
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-800 placeholder-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+                                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
                             />
-                            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+                            {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
                         </div>
+
                         <button
                             type="submit"
-                            className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-xl transition-colors shadow-lg shadow-emerald-200"
+                            className="w-full rounded-xl bg-sky-600 py-3 text-sm font-semibold text-white transition hover:bg-sky-700"
                         >
-                            Access Dashboard
+                            Access dashboard
                         </button>
                     </form>
                 </div>
@@ -68,29 +71,33 @@ export default function TeacherLayout({
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* We can keep a simplified header for the teacher view */}
-            <header className="bg-white shadow-sm">
-                <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <span className="text-2xl">👨‍🏫</span>
-                        <span className="font-bold text-xl text-gray-800">Teacher Portal</span>
+        <div className="min-h-screen bg-slate-100">
+            <header className="border-b border-slate-200 bg-white/95 backdrop-blur">
+                <div className="container flex h-16 items-center justify-between">
+                    <div className="inline-flex items-center gap-2.5">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100">
+                            <GraduationCap className="h-5 w-5 text-sky-700" />
+                        </div>
+                        <div>
+                            <p className="text-sm font-semibold text-slate-900">Teacher Portal</p>
+                            <p className="text-xs text-slate-500">Light mode analytics</p>
+                        </div>
                     </div>
+
                     <button
                         onClick={() => {
                             setIsAuthenticated(false);
                             sessionStorage.removeItem("teacherAuth");
                         }}
-                        className="text-sm font-medium text-gray-500 hover:text-red-500"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-rose-200 hover:text-rose-600"
                     >
+                        <LogOut className="h-3.5 w-3.5" />
                         Logout
                     </button>
                 </div>
             </header>
-            <main className="container mx-auto px-4 py-8">
-                {children}
-            </main>
+
+            <main className="container py-5 sm:py-8">{children}</main>
         </div>
     );
 }
-
