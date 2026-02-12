@@ -374,7 +374,7 @@ export default function CustomTestRunnerPage() {
             </main>
 
             {/* Navigation Footer */}
-            <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 md:relative md:bg-transparent md:border-0 md:p-0 md:mb-8">
+            <footer className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 z-50 md:relative md:bg-transparent md:border-0 md:p-0 md:mb-8">
                 <div className="container mx-auto max-w-3xl flex items-center justify-between gap-4">
                     <button
                         onClick={handlePrev}

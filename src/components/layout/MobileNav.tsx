@@ -21,6 +21,9 @@ export function MobileNav() {
 
     if (!user) return null;
 
+    // Hide mobile nav during test execution to prevent covering the answer buttons
+    if (pathname.includes("/custom-test/run")) return null;
+
     const teacherLinks = [
         { href: "/teacher", label: "Home", icon: LayoutDashboard },
         { href: "/teacher/questions", label: "Questions", icon: FileQuestion },
