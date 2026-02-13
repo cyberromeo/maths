@@ -84,6 +84,7 @@ export default function CustomTestRunnerPage() {
     const handleAnswer = (optionIndex: number) => {
         if (isFinished) return;
         setSelectedAnswers((prev) => ({
+            ...prev,
             [currentQuestionIndex]: optionIndex
         }));
     };
