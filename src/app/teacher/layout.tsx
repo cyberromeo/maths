@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GraduationCap, LockKeyhole, LogOut } from "lucide-react";
 
 export default function TeacherLayout({
@@ -8,12 +8,13 @@ export default function TeacherLayout({
 }: {
     children: React.ReactNode;
 }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        if (typeof window === "undefined") {
-            return false;
-        }
-        return sessionStorage.getItem("teacherAuth") === "true";
-    });
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [hydrated, setHydrated] = useState(false);
+
+    useEffect(() => {
+        setIsAuthenticated(sessionStorage.getItem("teacherAuth") === "true");
+        setHydrated(true);
+    }, []);
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
@@ -28,6 +29,14 @@ export default function TeacherLayout({
 
         setError("Incorrect password");
     };
+
+    if (!hydrated) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-slate-100">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-indigo-600" />
+            </div>
+        );
+    }
 
     if (!isAuthenticated) {
         return (

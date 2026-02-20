@@ -1,5 +1,42 @@
 import { databases, DATABASE_ID, COLLECTIONS, ID, Query } from "./appwrite";
 
+// ============ PAGINATION HELPER ============
+
+/**
+ * Fetches ALL documents from a collection by paginating through
+ * batches of 100 (Appwrite max per request). This avoids the
+ * default 25-document limit.
+ */
+async function fetchAllDocuments(
+    databaseId: string,
+    collectionId: string,
+    queries: string[] = []
+) {
+    const PAGE_SIZE = 100;
+    let allDocuments: unknown[] = [];
+    let offset = 0;
+    let hasMore = true;
+
+    // Remove any existing limit/offset queries so we control pagination
+    const baseQueries = queries.filter(
+        (q) => !q.includes('"limit"') && !q.includes('"offset"')
+    );
+
+    while (hasMore) {
+        const response = await databases.listDocuments(
+            databaseId,
+            collectionId,
+            [...baseQueries, Query.limit(PAGE_SIZE), Query.offset(offset)]
+        );
+
+        allDocuments = allDocuments.concat(response.documents);
+        offset += PAGE_SIZE;
+        hasMore = response.documents.length === PAGE_SIZE;
+    }
+
+    return allDocuments;
+}
+
 // ============ TYPES ============
 
 export interface Chapter {
@@ -61,12 +98,8 @@ export async function getChapters(medium?: "english" | "tamil"): Promise<Chapter
             queries.push(Query.equal("medium", medium));
         }
 
-        const response = await databases.listDocuments(
-            DATABASE_ID,
-            COLLECTIONS.CHAPTERS,
-            queries
-        );
-        return response.documents as unknown as Chapter[];
+        const docs = await fetchAllDocuments(DATABASE_ID, COLLECTIONS.CHAPTERS, queries);
+        return docs as unknown as Chapter[];
     } catch (error) {
         console.error("Error fetching chapters:", error);
         return [];
@@ -105,12 +138,8 @@ export async function getQuestions(chapterId?: string): Promise<Question[]> {
             ? [Query.equal("chapterId", chapterId), Query.orderDesc("createdAt")]
             : [Query.orderDesc("createdAt")];
 
-        const response = await databases.listDocuments(
-            DATABASE_ID,
-            COLLECTIONS.QUESTIONS,
-            queries
-        );
-        return response.documents as unknown as Question[];
+        const docs = await fetchAllDocuments(DATABASE_ID, COLLECTIONS.QUESTIONS, queries);
+        return docs as unknown as Question[];
     } catch (error) {
         console.error("Error fetching questions:", error);
         return [];
@@ -194,12 +223,8 @@ export async function getExams(type?: "practice" | "live", createdBy?: string): 
         if (type) queries.push(Query.equal("type", type));
         if (createdBy) queries.push(Query.equal("createdBy", createdBy));
 
-        const response = await databases.listDocuments(
-            DATABASE_ID,
-            COLLECTIONS.EXAMS,
-            queries
-        );
-        return response.documents as unknown as Exam[];
+        const docs = await fetchAllDocuments(DATABASE_ID, COLLECTIONS.EXAMS, queries);
+        return docs as unknown as Exam[];
     } catch (error) {
         console.error("Error fetching exams:", error);
         return [];
@@ -264,17 +289,13 @@ export async function updateExam(examId: string, data: Partial<Exam>): Promise<E
 
 export async function getResults(studentId?: string, examId?: string): Promise<ExamResult[]> {
     try {
-        const queries: string[] = [Query.orderDesc("completedAt"), Query.limit(100)];
+        const queries: string[] = [Query.orderDesc("completedAt")];
 
         if (studentId) queries.push(Query.equal("studentId", studentId));
         if (examId) queries.push(Query.equal("examId", examId));
 
-        const response = await databases.listDocuments(
-            DATABASE_ID,
-            COLLECTIONS.RESULTS,
-            queries
-        );
-        return response.documents as unknown as ExamResult[];
+        const docs = await fetchAllDocuments(DATABASE_ID, COLLECTIONS.RESULTS, queries);
+        return docs as unknown as ExamResult[];
     } catch (error) {
         console.error("Error fetching results:", error);
         return [];
@@ -344,12 +365,7 @@ export async function getAllStudents(medium?: "english" | "tamil") {
             queries.push(Query.equal("medium", medium));
         }
 
-        const response = await databases.listDocuments(
-            DATABASE_ID,
-            COLLECTIONS.USERS,
-            queries
-        );
-        return response.documents;
+        return await fetchAllDocuments(DATABASE_ID, COLLECTIONS.USERS, queries);
     } catch (error) {
         console.error("Error fetching students:", error);
         return [];
